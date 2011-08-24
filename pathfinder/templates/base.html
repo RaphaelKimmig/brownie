@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+
+	<head>
+	  <meta charset="utf-8" />
+    <title>
+      {% block title %}
+        Pathfinder DB
+      {% endblock %}
+    </title>
+    {% block css %}
+    <style src="http://html5resetcss.googlecode.com/files/html5reset-1.6.1.css"></style>    
+    {% endblock %}
+    {% block script %>
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    {% endblock %}
+  </head>
+  
+  <body>
+   {% block body %}
+   {% endblock %}
+  </body>  
+  
+</html>
