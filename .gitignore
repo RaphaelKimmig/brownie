@@ -1,0 +1,10 @@
+pdm/.idea
+pdm/settings_local.py
+*.pyc
+*.pyo
+*.swp
+*.swo
+pdm/pdm
+vm/*
+!vm/Vagrantfile
+!vm/manifests/*
