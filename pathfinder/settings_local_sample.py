@@ -1,7 +1,7 @@
-import os.path
+from os import path
 
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), "media")
+MEDIA_ROOT = path.join(path.dirname(__file__), "media")
 
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), "templates"),)
+TEMPLATE_DIRS = (path.join(path.dirname(__file__), "templates"),)
 
-STATIC_ROOT = os.path.join(os.path.dirname(__file__), "static")
+STATIC_ROOT = path.join(path.dirname(__file__), "static")
