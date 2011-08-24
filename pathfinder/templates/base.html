@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
-
+{% load static %}
 <head>
     <meta charset="utf-8" />
     <title>
         {% block title %}Pathfinder DB{% endblock %}
     </title>
     {% block css %}
-        <link  rel="stylesheet" href="http://html5resetcss.googlecode.com/files/html5reset-1.6.1.css"/>
+        <link  rel="stylesheet" href="{% get_static_prefix %}html5/html5reset-1.6.1.css"/>
+{#        <link  rel="stylesheet" href="http://html5resetcss.googlecode.com/files/html5reset-1.6.1.css"/>#}
     {% endblock %}
     {% block script %}
         <!--[if lt IE 9]>
-        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <script src="{% get_static_prefix %}html5/html5reset-1.6.1.css"></script>
+{#        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>#}
         <![endif]-->
     {% endblock %}
 </head>
