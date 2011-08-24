@@ -5,7 +5,6 @@ from django.views.generic.simple import direct_to_template
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-from django.views.generic.simple import direct_to_template
 
 admin.autodiscover()
 
@@ -15,7 +14,6 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'pathfinder.views.home', name='home'),
     # url(r'^pathfinder/', include('pathfinder.foo.urls')),
-    url(r'^$', direct_to_template, {'template': 'base.html'}),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
