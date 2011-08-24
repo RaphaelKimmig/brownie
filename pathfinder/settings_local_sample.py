@@ -1,7 +1,7 @@
-MEDIA_ROOT = '/home/raphael/Source/work/pathfinder/media'
+import os.path
 
-TEMPLATE_DIRS = ('/home/raphael/Source/work/pathfinder/templates',)
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), "media")
 
-STATICFILES_DIRS = (
-    '/home/raphael/Source/work/pdm/static_media/',
-)
+TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), "templates"),)
+
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), "static")
