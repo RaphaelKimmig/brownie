@@ -1,4 +1,5 @@
 Django==1.3
+Pillow==1.7.4
 South==0.7.3
 Werkzeug==0.7.1
 django-extensions==0.6
