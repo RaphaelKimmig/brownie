@@ -122,6 +122,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'south',
     'core',
+    'items'
 )
 
 # A sample logging configuration. The only tangible logging
