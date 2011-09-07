@@ -54,10 +54,10 @@ class Weapon(BaseItem):
     _critical = models.CharField(max_length=255, default="20/x2", verbose_name=_("Critical"))
     _type = models.CharField(max_length=255, choices=WEAPON_TYPES, default="slashing", verbose_name=_("Type"))
     _usefulness = models.CharField(max_length=255, choices=WEAPON_USEFULNESS, default="meele", verbose_name=_("Usefulness"))
-    _encumbrance = models.CharField(max_length=255, choices=WEAPON_ENCUMBRACE, default="one_handed", verbose_name=_("Encumbrance"))
+    _encumbrance = models.CharField(max_length=255, choices=WEAPON_ENCUMBRANCE, default="one_handed", verbose_name=_("Encumbrance"))
     _training = models.CharField(max_length=255, choices=WEAPON_TRAINING, default="martial", verbose_name=_("Training"))
     _range = models.IntegerField(default=0, verbose_name=_("Range in feet"))
-    _ammunition = models.ManyToManyField(Ammunition)
+    _ammunition = models.ManyToManyField('Ammunition')
     
     # weapon specials
     _special_brace = models.BooleanField(default=False)
