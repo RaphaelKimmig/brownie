@@ -16,14 +16,10 @@ class BaseItem(models.Model):
         abstract = True
 
     def __unicode__(self):
-        return self.name
-
-
-
+        return self._name
 
 class Commodity(BaseItem):
     pass
-
 
 WEAPON_TYPES = (
     ("bludgeoning", _("Bludgeoning")),
@@ -70,11 +66,22 @@ class Weapon(BaseItem):
     _special_double = models.BooleanField(default=False)
     _special_reach = models.BooleanField(default=False)
     _special_trip = models.BooleanField(default=False)
-    _special_nonleathal = models.BooleanField(default=False)
-
-class Armor(BaseItem):
-    pass
+    _special_nonlethal = models.BooleanField(default=False)
     
 class Ammunition(BaseItem):
     pass
-    
+
+ARMOR_CATEGORIES = (
+    ("light", _("Light")),
+    ("medium", _("Medium")),
+    ("heavy", _("Heavy")),
+    ("shield", _("Shield")),
+    ("extra", _("Extra")),
+)
+
+class Armor(BaseItem):
+    armor_class = models.IntegerField(verbose_name=_("Armor class"))
+    maximum_dexterity_bonus = models.PositiveIntegerField(verbose_name=_("Maximum dexterity bonus"))
+    armor_check_penalty = models.IntegerField(verbose_name=_("Armor check penalty"))
+    arcane_spell_failure = models.PositiveIntegerField(verbose_name=_("Arcane spell failure"))
+    category = models.CharField(choices=ARMOR_CATEGORIES, verbose_name=("Category"), max_length=16)
