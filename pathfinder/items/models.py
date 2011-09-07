@@ -31,11 +31,19 @@ WEAPON_TYPES = (
     ("slashing", _("Slashing")),
     ("piercing_slashing", _("Piercing and slashing"))
     )
+    
+WEAPON_CATEGORY = (
+    ("meele", _("Meele")),
+    ("projectile", _("Projectile")),
+    ("thrown", _("Thrown")),
+    ("thrown_only", _("Thrown only"))
+    )
 
 class Weapon(BaseItem):
     _damage = models.CharField(max_length=20)
     _critical = models.CharField(max_length=20)
     _type = models.CharField(max_length=20, choices=WEAPON_TYPES)
+    
     
     # weapon specials
     _special_brace = models.BooleanField(default=False)
