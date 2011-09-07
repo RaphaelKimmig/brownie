@@ -4,13 +4,13 @@ from django.conf import settings
 # Create your models here.
 
 class BaseItem(models.Model):
-    price = models.DecimalField(default=0, max_digits=32, decimal_places=2, verbose_name=_("Price in gold coins"))
-    weight = models.DecimalField(default=0, max_digits=32, decimal_places=1, verbose_name=_("Weight in pounds"))
+    _price = models.DecimalField(default=0, max_digits=32, decimal_places=2, verbose_name=_("Price in gold coins"))
+    _weight = models.DecimalField(default=0, max_digits=32, decimal_places=1, verbose_name=_("Weight in pounds"))
 
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, default='')
+    _name = models.CharField(max_length=255, default='')
+    _description = models.TextField(blank=True, default='')
 
-    image = models.ImageField(upload_to=settings.MEDIA_ROOT, blank=True, null=True)
+    _image = models.ImageField(upload_to=settings.MEDIA_ROOT, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -26,26 +26,27 @@ class Commodity(BaseItem):
 
 
 WEAPON_TYPES = (
-    (0, _("Bludgeoning")),
-    (1,_("Piercing")),
-    (2, _("Slashing"))
+    ("bludgeoning", _("Bludgeoning")),
+    ("piercing",_("Piercing")),
+    ("slashing", _("Slashing")),
+    ("piercing_slashing", _("Piercing and slashing"))
     )
-WEAPON_SPECIALS = (
-    (0, _("Brace")),
-    (1, _("Disarm")),
-    (2, _("Double")),
-    (3, _("Monk")),
-    (4, _("Nonlethal")),
-    (5, _("Reach")),
-    (6, _("Trip")),
-)
 
 class Weapon(BaseItem):
-    damage = models.CharField(max_length=20)
-    critical = models.CharField(max_length=20)
-    type = models.IntegerField(choices=WEAPON_TYPES)
-
+    _damage = models.CharField(max_length=20)
+    _critical = models.CharField(max_length=20)
+    _type = models.CharField(max_length=20, choices=WEAPON_TYPES)
+    
+    # weapon specials
+    _special_brace = models.BooleanField(default=False)
+    _special_disarm = models.BooleanField(default=False)
+    _special_monk = models.BooleanField(default=False)
+    _special_double = models.BooleanField(default=False)
+    _special_reach = models.BooleanField(default=False)
+    _special_trip = models.BooleanField(default=False)
+    _special_nonleathal = models.BooleanField(default=False)
 
 
 class Armor(BaseItem):
     pass
+    
