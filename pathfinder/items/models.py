@@ -59,7 +59,7 @@ ARMOR_CATEGORIES = (
     ("light", _("Light")),
     ("medium", _("Medium")),
     ("heavy", _("Heavy")),
-    ("shield", _("Shiled")),
+    ("shield", _("Shield")),
     ("extra", _("Extra")),
 )
 
