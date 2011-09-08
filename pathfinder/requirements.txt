@@ -5,6 +5,7 @@ Werkzeug==0.7.1
 django-extensions==0.6
 django-grappelli==2.3.3
 django-taggit==0.9.3
-django-taggit-autosuggest==0.1
 ipython==0.11
 wsgiref==0.1.2
+hg+https://bitbucket.org/fabian/django-taggit-autosuggest#egg=django-taggit-autosuggest
+
