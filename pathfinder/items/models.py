@@ -20,6 +20,12 @@ class BaseItem(models.Model):
 
     def __unicode__(self):
         return self._name
+        
+    def get_price(self):
+        return _("%d gp") % int(self._price)
+    get_price.short_description = _('Price')           
+    get_price.admin_order_field = '_price'
+    price = property(get_price)         
 
 class Commodity(BaseItem):
     pass
@@ -77,6 +83,17 @@ class Weapon(BaseItem):
     _special_reach = models.BooleanField(default=False, verbose_name=_("Reach"))
     _special_trip = models.BooleanField(default=False, verbose_name=_("Trip"))
     _special_nonlethal = models.BooleanField(default=False, verbose_name=_("Nonlethal"))    
+    
+    def specials(self):
+        special_list = ['brace', 'disarm', 'monk', 'double', 'reach', 'trip', 'nonlethal']
+        output_list = []
+        for special in special_list:
+            field = '_special_%s' % special
+            if getattr(self, field):
+                verbose = self._meta.get_field_by_name(field)[0].verbose_name
+                output_list.append(verbose)
+        return ", ".join(output_list)
+    specials.short_description = _("Specials")
     
 class Ammunition(BaseItem):
     _type = models.CharField(max_length=255, default="arrow", verbose_name=_("Type"))
