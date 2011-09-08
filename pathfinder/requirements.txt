@@ -3,5 +3,6 @@ Pillow==1.7.4
 South==0.7.3
 Werkzeug==0.7.1
 django-extensions==0.6
+django-taggit==0.9.3
 ipython==0.11
 wsgiref==0.1.2

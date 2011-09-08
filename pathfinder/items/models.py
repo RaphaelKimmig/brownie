@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 from django.conf import settings
 # Create your models here.
+from taggit.managers import TaggableManager
 
 class BaseItem(models.Model):
     _price = models.DecimalField(default=0, max_digits=32, decimal_places=2, verbose_name=_("Price in gold coins"))
@@ -11,6 +12,8 @@ class BaseItem(models.Model):
     _description = models.TextField(blank=True, default='', verbose_name=_("Description"))
 
     _image = models.ImageField(upload_to=settings.MEDIA_ROOT, blank=True, null=True, verbose_name=_("Image"))
+
+    tags = TaggableManager()
 
     class Meta:
         abstract = True
@@ -50,14 +53,14 @@ WEAPON_TRAINING = (
     )
 
 class Weapon(BaseItem):
-    _damage = models.CharField(max_length=255, default="1d8", verbose_name=_("Demage"))
+    _damage = models.CharField(max_length=255, default="1d8", verbose_name=_("Damage"))
     _critical = models.CharField(max_length=255, default="20/x2", verbose_name=_("Critical"))
     _type = models.CharField(max_length=255, choices=WEAPON_TYPES, default="slashing", verbose_name=_("Type"))
-    _usefulness = models.CharField(max_length=255, choices=WEAPON_USEFULNESS, default="meele", verbose_name=_("Usefulness"))
+    _usefulness = models.CharField(max_length=255, choices=WEAPON_USEFULNESS, default="melee", verbose_name=_("Usefulness"))
     _encumbrance = models.CharField(max_length=255, choices=WEAPON_ENCUMBRANCE, default="one_handed", verbose_name=_("Encumbrance"))
     _training = models.CharField(max_length=255, choices=WEAPON_TRAINING, default="martial", verbose_name=_("Training"))
     _range = models.IntegerField(default=0, verbose_name=_("Range in feet"))
-    _ammunition = models.ManyToManyField('Ammunition')
+    _ammunition = models.ManyToManyField('Ammunition', null=True, blank=True)
     
     # weapon specials
     _special_brace = models.BooleanField(default=False)
