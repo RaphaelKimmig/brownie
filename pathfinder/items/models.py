@@ -60,7 +60,7 @@ class Weapon(BaseItem):
     _encumbrance = models.CharField(max_length=255, choices=WEAPON_ENCUMBRANCE, default="one_handed", verbose_name=_("Encumbrance"))
     _training = models.CharField(max_length=255, choices=WEAPON_TRAINING, default="martial", verbose_name=_("Training"))
     _range = models.IntegerField(default=0, verbose_name=_("Range in feet"))
-    _ammunition = models.ManyToManyField('Ammunition', null=True, blank=True)
+    _ammunition = models.CharField(max_length=255, choices=AMMUNITION_TYPES, blank=True, null=True, verbose_name=_("Ammunition"))
     
     # weapon specials
     _special_brace = models.BooleanField(default=False)
@@ -71,8 +71,15 @@ class Weapon(BaseItem):
     _special_trip = models.BooleanField(default=False)
     _special_nonlethal = models.BooleanField(default=False)
     
+AMMUNITION_TYPES = (
+    ("arrow", _("Arrow")),
+    ("bolt", _("Bolt")),
+    ("dart", _("Dart")),
+    ("sling_bullet", _("Sling bullet"))
+    )    
+    
 class Ammunition(BaseItem):
-    pass
+    _type = models.CharField(max_length=255, default="arrow", verbose_name=_("Type"))
 
 ARMOR_CATEGORIES = (
     ("light", _("Light")),
