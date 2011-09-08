@@ -70,13 +70,13 @@ class Weapon(BaseItem):
     _ammunition = models.CharField(max_length=255, choices=AMMUNITION_TYPES, blank=True, null=True, verbose_name=_("Ammunition"))
     
     # weapon specials
-    _special_brace = models.BooleanField(default=False)
-    _special_disarm = models.BooleanField(default=False)
-    _special_monk = models.BooleanField(default=False)
-    _special_double = models.BooleanField(default=False)
-    _special_reach = models.BooleanField(default=False)
-    _special_trip = models.BooleanField(default=False)
-    _special_nonlethal = models.BooleanField(default=False)    
+    _special_brace = models.BooleanField(default=False, verbose_name=_("Brace"))
+    _special_disarm = models.BooleanField(default=False, verbose_name=_("Disarm"))
+    _special_monk = models.BooleanField(default=False, verbose_name=_("Monk"))
+    _special_double = models.BooleanField(default=False, verbose_name=_("Double"))
+    _special_reach = models.BooleanField(default=False, verbose_name=_("Reach"))
+    _special_trip = models.BooleanField(default=False, verbose_name=_("Trip"))
+    _special_nonlethal = models.BooleanField(default=False, verbose_name=_("Nonlethal"))    
     
 class Ammunition(BaseItem):
     _type = models.CharField(max_length=255, default="arrow", verbose_name=_("Type"))

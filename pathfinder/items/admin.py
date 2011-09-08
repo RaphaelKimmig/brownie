@@ -5,7 +5,8 @@ from models import Weapon, Armor, Commodity
 class WeaponAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Generic', {
-            'fields': ('_name', '_price', '_weight', '_description', '_image')
+            'fields': (('_name', '_price', '_weight'),
+                       ( '_description', '_image'),)
         }),
         ('Weaponstuff', {
             'fields': (('_damage', '_critical'),
