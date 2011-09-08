@@ -125,7 +125,8 @@ INSTALLED_APPS = (
     'taggit',
     'taggit_autosuggest',
     'core',
-    'items'
+    'items',
+    'django.contrib.databrowse'
 )
 
 # A sample logging configuration. The only tangible logging

@@ -20,11 +20,16 @@ class WeaponAdmin(admin.ModelAdmin):
         }),
         ('Special', {
             #            'classes': ('collapse',),
+            'classes': ('boolean_only',),
             'fields': (('_special_brace','_special_disarm','_special_monk', '_special_double',
                         '_special_reach','_special_trip','_special_nonlethal',), )
         }),
         )
 
+    class Media:
+       css = {
+            "all": ("css/admin_custom.css",)
+        }
     list_display = ('_name', '_price')
 
 admin.site.register(Weapon, WeaponAdmin)

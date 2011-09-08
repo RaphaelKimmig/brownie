@@ -5,12 +5,14 @@ from django.views.generic.simple import direct_to_template
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+from django.contrib import databrowse
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
                        # base test
                        url(r'^$', direct_to_template, {'template': 'base.html'}),
+                       (r'^databrowse/(.*)', databrowse.site.root),
                        # Examples:
                        # url(r'^$', 'pathfinder.views.home', name='home'),
                        # url(r'^pathfinder/', include('pathfinder.foo.urls')),

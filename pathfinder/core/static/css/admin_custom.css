@@ -1,0 +1,6 @@
+fieldset.boolean_only div.span-4 {
+    display: none;
+}
+fieldset.boolean_only div.span-flexible {
+    margin-left: 10px;
+}

@@ -60,8 +60,8 @@ AMMUNITION_TYPES = (
     )
 
 class Weapon(BaseItem):
-    _damage = models.CharField(max_length=255, default="1d8", verbose_name=_("Damage"))
-    _critical = models.CharField(max_length=255, default="20/x2", verbose_name=_("Critical"))
+    _damage = models.CharField(max_length=16, default="1d8", verbose_name=_("Damage"))
+    _critical = models.CharField(max_length=16, default="20/x2", verbose_name=_("Critical"))
     _type = models.CharField(max_length=255, choices=WEAPON_TYPES, default="slashing", verbose_name=_("Type"))
     _usefulness = models.CharField(max_length=255, choices=WEAPON_USEFULNESS, default="melee", verbose_name=_("Usefulness"))
     _encumbrance = models.CharField(max_length=255, choices=WEAPON_ENCUMBRANCE, default="one_handed", verbose_name=_("Encumbrance"))
@@ -95,3 +95,8 @@ class Armor(BaseItem):
     armor_check_penalty = models.IntegerField(verbose_name=_("Armor check penalty"))
     arcane_spell_failure = models.PositiveIntegerField(verbose_name=_("Arcane spell failure"))
     category = models.CharField(choices=ARMOR_CATEGORIES, verbose_name=("Category"), max_length=16)
+
+
+from django.contrib import databrowse
+
+databrowse.site.register(Weapon)
