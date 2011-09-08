@@ -6,7 +6,10 @@ class WeaponAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Generic', {
             'fields': (('_name', '_price', '_weight'),
-                       ( '_description', '_image'),)
+                       ( '_image',),
+                       ( '_description',),
+                       ( 'tags',)
+                       )
         }),
         ('Weaponstuff', {
             'fields': (('_damage', '_critical'),
