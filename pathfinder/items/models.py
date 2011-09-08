@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 from django.conf import settings
 # Create your models here.
-from taggit.managers import TaggableManager
+from taggit_autosuggest.managers import TaggableManager
 
 class BaseItem(models.Model):
     _price = models.DecimalField(default=0, max_digits=32, decimal_places=2, verbose_name=_("Price in gold coins"))

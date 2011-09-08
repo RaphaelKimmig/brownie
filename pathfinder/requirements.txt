@@ -6,3 +6,5 @@ django-extensions==0.6
 django-taggit==0.9.3
 ipython==0.11
 wsgiref==0.1.2
+django-taggit-autosuggest
+-e hg+https://bitbucket.org/fabian/django-taggit-autosuggest#egg=django-taggit-autosuggest

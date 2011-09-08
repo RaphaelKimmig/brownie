@@ -22,6 +22,8 @@ class WeaponAdmin(admin.ModelAdmin):
         }),
         )
 
+    list_display = ('_name', '_price')
+
 admin.site.register(Weapon, WeaponAdmin)
 admin.site.register(Armor)
 admin.site.register(Commodity)
