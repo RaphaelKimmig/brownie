@@ -51,6 +51,13 @@ WEAPON_TRAINING = (
     ("martial", _("Martial")),
     ("exotic", _("Exotic"))
     )
+    
+AMMUNITION_TYPES = (
+    ("arrow", _("Arrow")),
+    ("bolt", _("Bolt")),
+    ("dart", _("Dart")),
+    ("sling_bullet", _("Sling bullet"))
+    )
 
 class Weapon(BaseItem):
     _damage = models.CharField(max_length=255, default="1d8", verbose_name=_("Damage"))
@@ -69,14 +76,7 @@ class Weapon(BaseItem):
     _special_double = models.BooleanField(default=False)
     _special_reach = models.BooleanField(default=False)
     _special_trip = models.BooleanField(default=False)
-    _special_nonlethal = models.BooleanField(default=False)
-    
-AMMUNITION_TYPES = (
-    ("arrow", _("Arrow")),
-    ("bolt", _("Bolt")),
-    ("dart", _("Dart")),
-    ("sling_bullet", _("Sling bullet"))
-    )    
+    _special_nonlethal = models.BooleanField(default=False)    
     
 class Ammunition(BaseItem):
     _type = models.CharField(max_length=255, default="arrow", verbose_name=_("Type"))
