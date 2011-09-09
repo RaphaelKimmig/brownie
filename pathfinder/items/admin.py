@@ -20,11 +20,15 @@ class WeaponAdmin(admin.ModelAdmin):
         }),
         ('Special', {
             #            'classes': ('collapse',),
-            'fields': (('_special_brace','_special_disarm','_special_monk', '_special_double'),
-                       ('_special_reach','_special_trip','_special_nonlethal',), )
+            'classes': ('boolean_only',),
+            'fields': (('_special_brace','_special_disarm','_special_monk', '_special_double', '_special_reach','_special_trip','_special_nonlethal',), )
         }),
         )
 
+    class Media:
+       css = {
+            "all": ("css/admin_custom.css",)
+        }
     list_display = ('_name', 'get_price', '_damage', '_critical', '_range', '_weight', '_type', 'specials')
     
     search_fields = ('_name', '_damage')
