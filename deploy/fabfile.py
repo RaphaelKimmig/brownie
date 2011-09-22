@@ -5,12 +5,15 @@ from fabric.api import abort, cd, env, get, hide, hosts, local, prompt, \
     put, require, roles, run, runs_once, settings, show, sudo, warn, task
 
 from fabric.contrib.console import confirm
+from fabric.contrib import files
 
 PROJECT_NAME = 'brownie'
 DEPLOY_USER = 'django_brownie'
-PROJECT_BASE_DIR = '/srv/'
-PROJECT_DIR = os.path.join(PROJECT_BASE_DIR, PROJECT_NAME)
 PROJECT_REPOSITORY = 'https://github.com/RaphaelKimmig/brownie.git'
+
+PROJECT_BASE_DIR = '/srv/django/'
+PROJECT_DIR = os.path.join(PROJECT_BASE_DIR, PROJECT_NAME)
+ENV_DIR = os.path.join(PROJECT_DIR, 'env')
 
 def check_dependencies(dependencies):
     missing = []
@@ -21,30 +24,40 @@ def check_dependencies(dependencies):
             missing.append(dependency)
     return missing
 
+
 @task
 def bootstrap_dev():
     local("virtualenv --no-site-packages ../env")
     local("pip install -E ../env -r %s" % '../requirements.txt')
 
-def setup_base():
-    try:
-        sudo("useradd %(user)s -d %(home)s -U" % {'user': DEPLOY_USER, 'home': PROJECT_DIR})
-    except:
-        pass
+
+
 
 @task
 def deploy():
-    setup_base()
+    if os.path.exists(PROJECT_DIR):
+        warn("Project dir %s already exists" % PROJECT_DIR)
+        sys.exit(0)
+
+    try:
+        sudo("useradd %(user)s -d %(home)s -U" % {'user': DEPLOY_USER, 'home': PROJECT_DIR})
+    except:
+        warn("user %s already exists" % DEPLOY_USER)
 
     with cd(PROJECT_BASE_DIR):
-        sudo("git clone %s" % PROJECT_REPOSITORY)
-        sudo("chown -R %(user)s:%(user)s %(directory)s" % {'user': DEPLOY_USER,
-            'directory': PROJECT_DIR})
+        run("git clone %s" % PROJECT_REPOSITORY)
 
-    with cd(PROJECT_DIR):
-        sudo("virtualenv --no-site-packages env", user=DEPLOY_USER)
-        sudo("pip install -E env -r %s" % 'deploy/requirements.txt', user=DEPLOY_USER)
-        
+    run("virtualenv --no-site-packages %s" % ENV_DIR)
+    run("pip install -E %(env)s -r %(req)s" % {'env': ENV_DIR, 'req': os.path.join(PROJECT_DIR, 'deploy/requirements.txt')})
+
+    uwsgi_config = os.path.join(PROJECT_DIR, 'deploy/config/uwsgi')
+    files.sed(uwsgi_config, 'PROJECT_NAME', PROJECT_NAME)
+    files.sed(uwsgi_config, 'PROJECT_DIR', PROJECT_DIR)
+    files.sed(uwsgi_config, 'ENV_DIR',  ENV_DIR)
+
+    sudo("chown -R %(user)s:%(user)s %(directory)s" % {'user': DEPLOY_USER,
+        'directory': PROJECT_DIR})
+
 # def vagrant():
 #     # change from the default user to 'vagrant'
 #     env.user = 'vagrant'
