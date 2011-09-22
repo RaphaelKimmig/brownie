@@ -9,6 +9,8 @@ from fabric.contrib import files
 
 PROJECT_NAME = 'brownie'
 DEPLOY_USER = 'django_brownie'
+PROJECT_SETTINGS = 'django_brownie.settings.deploy'
+
 PROJECT_REPOSITORY = 'https://github.com/RaphaelKimmig/brownie.git'
 
 PROJECT_BASE_DIR = '/srv/django/'
@@ -50,10 +52,11 @@ def deploy():
     run("virtualenv --no-site-packages %s" % ENV_DIR)
     run("pip install -E %(env)s -r %(req)s" % {'env': ENV_DIR, 'req': os.path.join(PROJECT_DIR, 'deploy/requirements.txt')})
 
-    uwsgi_config = os.path.join(PROJECT_DIR, 'deploy/config/uwsgi')
+    uwsgi_config = os.path.join(PROJECT_DIR, 'deploy/configs/uwsgi')
     files.sed(uwsgi_config, 'PROJECT_NAME', PROJECT_NAME)
     files.sed(uwsgi_config, 'PROJECT_DIR', PROJECT_DIR)
     files.sed(uwsgi_config, 'ENV_DIR',  ENV_DIR)
+    files.sed(uwsgi_config, 'PROJECT_SETTINGS',  PROJECT_SETTINGS)
 
     sudo("chown -R %(user)s:%(user)s %(directory)s" % {'user': DEPLOY_USER,
         'directory': PROJECT_DIR})
