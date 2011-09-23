@@ -1,7 +1,0 @@
-[PROJECT_NAME]
-master = true
-processes = 4
-env = DJANGO_SETTINGS_MODULE=PROJECT_SETTINGS
-pythonpath = ENV_DIR
-pythonpath = PROJECT_DIR
-module = django.core.handlers.wsgi:WSGIHandler()

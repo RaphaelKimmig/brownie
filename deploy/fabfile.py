@@ -5,17 +5,22 @@ from fabric.api import abort, cd, env, get, hide, hosts, local, prompt, \
     put, require, roles, run, runs_once, settings, show, sudo, warn, task
 
 from fabric.contrib.console import confirm
-from fabric.contrib import files
+from fabric.contrib.files import upload_template 
 
-PROJECT_NAME = 'brownie'
-DEPLOY_USER = 'django_brownie'
-PROJECT_SETTINGS = 'django_brownie.settings.deploy'
+env.project_name = 'brownie'
+env.server_name_template = 'brownie.%(host)s'
 
-PROJECT_REPOSITORY = 'https://github.com/RaphaelKimmig/brownie.git'
+env.deploy_user = 'django_%s' % env.project_name
+env.settings_module = '%s.settings.deploy' % env.project_name
 
-PROJECT_BASE_DIR = '/srv/django/'
-PROJECT_DIR = os.path.join(PROJECT_BASE_DIR, PROJECT_NAME)
-ENV_DIR = os.path.join(PROJECT_DIR, 'env')
+env.project_repository = 'git://github.com/RaphaelKimmig/brownie.git'
+
+env.project_base_dir = '/srv/django/'
+env.project_dir = os.path.join(env.project_base_dir, env.project_name)
+env.virtualenv_dir = os.path.join(env.project_dir, 'env')
+
+env.media_root = '/media/'
+env.static_root = '/media/static/'
 
 def check_dependencies(dependencies):
     missing = []
@@ -33,33 +38,62 @@ def bootstrap_dev():
     local("pip install -E ../env -r %s" % '../requirements.txt')
 
 
+def copy_configs():
+    uwsgi_template = os.path.join(env.project_dir, 'deploy/configs/uwsgi.ini')
+    uwsgi_config = '/etc/uwsgi/apps-enabled/%s.ini' % env.project_name
+    upload_template(uwsgi_template, uwsgi_config, {
+        'project_name': env.project_name, 
+        'project_dir': env.project_dir,
+        'env': env.virtualenv_dir,
+        'settings_module': env.settings_module
+        }, use_sudo=True)
 
+    nginx_template = os.path.join(env.project_dir, 'deploy/configs/nginx.conf')
+    nginx_config = '/etc/nginx/sites-enabled/%s.conf' % env.project_name
+    upload_template(nginx_template, nginx_config, {
+        'project_name': env.project_name, 
+        'server_name': env.server_name_template % env.host,
+        'static_root': env.static_root,
+        'media_root': env.media_root,
+        }, use_sudo=True)
 
 @task
 def deploy():
-    if os.path.exists(PROJECT_DIR):
-        warn("Project dir %s already exists" % PROJECT_DIR)
-        sys.exit(0)
-
+    run('whoami')
     try:
-        sudo("useradd %(user)s -d %(home)s -U" % {'user': DEPLOY_USER, 'home': PROJECT_DIR})
+        sudo("useradd %(user)s -d %(home)s -U" % {'user': env.deploy_user, 'home': env.project_dir})
     except:
-        warn("user %s already exists" % DEPLOY_USER)
+        warn("user %s already exists" % env.deploy_user)
 
-    with cd(PROJECT_BASE_DIR):
-        run("git clone %s" % PROJECT_REPOSITORY)
+    if os.path.exists(env.project_dir):
+        warn("Project dir %s already exists" % env.project_dir)
+        with cd(env.project_dir):
+            sudo('git pull', user=env.deploy_user)
+    else:
+        with cd(env.project_base_dir):
+            sudo("git clone %s" % env.project_repository)
+            sudo("chown -R %(user)s:%(user)s %(directory)s" % {'user':
+                env.deploy_user, 'directory': env.project_dir})
 
-    run("virtualenv --no-site-packages %s" % ENV_DIR)
-    run("pip install -E %(env)s -r %(req)s" % {'env': ENV_DIR, 'req': os.path.join(PROJECT_DIR, 'deploy/requirements.txt')})
+    for dir in ('logs', 'public'):
+        full_dir = os.path.join(env.project_dir, dir)
+        if not os.path.exists(full_dir):
+            sudo("mkdir %s" % full_dir, user=env.deploy_user)
 
-    uwsgi_config = os.path.join(PROJECT_DIR, 'deploy/configs/uwsgi')
-    files.sed(uwsgi_config, 'PROJECT_NAME', PROJECT_NAME)
-    files.sed(uwsgi_config, 'PROJECT_DIR', PROJECT_DIR)
-    files.sed(uwsgi_config, 'ENV_DIR',  ENV_DIR)
-    files.sed(uwsgi_config, 'PROJECT_SETTINGS',  PROJECT_SETTINGS)
+    sudo("virtualenv --no-site-packages %s" % env.virtualenv_dir,
+            user=env.deploy_user)
+    sudo("pip install -E %(env)s -r %(req)s" % {'env': env.virtualenv_dir,
+        'req': os.path.join(env.project_dir, 'deploy/requirements.txt')},
+        user=env.deploy_user)
 
-    sudo("chown -R %(user)s:%(user)s %(directory)s" % {'user': DEPLOY_USER,
-        'directory': PROJECT_DIR})
+    copy_configs()
+    sudo('service uwsgi reload')
+    sudo('service nginx reload')
+
+
+@task 
+def update():
+    pass
 
 # def vagrant():
 #     # change from the default user to 'vagrant'
