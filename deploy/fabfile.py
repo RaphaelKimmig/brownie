@@ -12,14 +12,13 @@ import tempfile
 env.project_name = 'brownie'
 env.server_name_template = 'brownie.%(host)s'
 
-env.deploy_user = 'django_%s' % env.project_name
+env.deploy_user = 'www-data'
 env.settings_module = '%s.settings.deploy' % env.project_name
 
 env.project_repository = 'git://github.com/RaphaelKimmig/brownie.git'
 
 env.project_base_dir = '/srv/django/'
 env.project_dir = os.path.join(env.project_base_dir, env.project_name)
-env.project_apps_dir = os.path.join(env.project_dir, env.project_name)
 env.virtualenv_dir = os.path.join(env.project_dir, 'env')
 
 env.media_root = '/media/'
@@ -42,15 +41,14 @@ def bootstrap_dev():
 
 def django_command(cmd):
     activate = os.path.join(env.virtualenv_dir, 'bin/activate')
-    path = '%s:%s' % (env.project_dir, env.project_apps_dir)
     return sudo("source %(activate)s && django-admin.py %(cmd)s \
             --settings=%(settings)s --pythonpath=%(path)s" % { 'cmd':
                 cmd, 'activate': activate, 'settings': env.settings_module,
-                'path': path}, user=env.deploy_user)
+                'path': env.project_dir}, user=env.deploy_user)
 
 def config_from_template(template, config, context):
     fd, tmp_file = tempfile.mkstemp()
-    get(template, local_path=tmp_file)
+    get(template, local_path=tmp_file, use_sudo=True)
     with open(tmp_file, 'r') as f:
         t = f.read()
         t = t % context
@@ -61,21 +59,21 @@ def config_from_template(template, config, context):
 
 
 def copy_configs():
-    uwsgi_template = os.path.join(env.project_dir, 'deploy/configs/uwsgi.xml')
+    uwsgi_template = 'configs/uwsgi.xml'
     uwsgi_config = '/etc/uwsgi/apps-enabled/%s.xml' % env.project_name
     virtualen_lib = sudo("find %s -mindepth 3 -maxdepth 3 -type d -name\
             'site-packages'" % env.virtualenv_dir, user=env.deploy_user).splitlines()[-1]
     uwsgi_context = {
         'project_name': env.project_name, 
         'project_dir': env.project_dir,
-        'project_apps_dir': env.project_apps_dir,
         'env': virtualen_lib,
         'settings_module': env.settings_module,
         'user': env.deploy_user,
         }
-    config_from_template(uwsgi_template, uwsgi_config, uwsgi_context)
+    upload_template(uwsgi_template, uwsgi_config, uwsgi_context, use_sudo=True,
+            backup=False)
 
-    nginx_template = os.path.join(env.project_dir, 'deploy/configs/nginx.conf')
+    nginx_template = 'configs/nginx.conf'
     nginx_config = '/etc/nginx/sites-enabled/%s.conf' % env.project_name
     nginx_context = {
         'project_dir': env.project_dir,
@@ -84,7 +82,8 @@ def copy_configs():
         'static_root': env.static_root,
         'media_root': env.media_root,
         }
-    config_from_template(nginx_template, nginx_config, nginx_context)
+    upload_template(nginx_template, nginx_config, nginx_context, use_sudo=True,
+            backup=False)
 
 @task
 def deploy():
@@ -100,11 +99,9 @@ def deploy():
             sudo("git clone %s" % env.project_repository)
             sudo("chown -R %(user)s:%(user)s %(directory)s" % {'user':
                 env.deploy_user, 'directory': env.project_dir})
-
-    for dir in ('logs', 'public'):
-        full_dir = os.path.join(env.project_dir, dir)
-        if not os.path.exists(full_dir):
-            sudo("mkdir %s" % full_dir, user=env.deploy_user)
+            sudo("chmod 750 %s" % env.project_dir)
+            for dir in ('logs', 'public', 'media/static', 'media/dynamic'):
+                sudo("mkdir -p %s" % full_dir, user=env.deploy_user)
 
     if not os.path.exists(env.virtualenv_dir):
         sudo("virtualenv --no-site-packages %s" % env.virtualenv_dir,
@@ -112,14 +109,14 @@ def deploy():
     sudo("pip install -E %(env)s -r %(req)s" % {'env': env.virtualenv_dir,
         'req': os.path.join(env.project_dir, 'deploy/requirements.txt')},
         user=env.deploy_user)
+
     django_command('syncdb')
     django_command('migrate')
 
-
     copy_configs()
+
     sudo('service uwsgi reload')
     sudo('service nginx reload')
-
 
 @task 
 def update():
