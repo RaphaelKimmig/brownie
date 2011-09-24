@@ -103,9 +103,9 @@ def deploy():
         user=env.deploy_user)
     with cd(env.project_base_dir):
         activate = os.path.join(env.virtualenv_dir, 'bin/activate')
-        sudo("source %s && export DJANGO_SETTINGS_MODULE=%s && manage.py\
+        sudo("source %s && export DJANGO_SETTINGS_MODULE=%s && django-admin.py\
                 syncdb" % (activate, env.settings_module), user=env.deploy_user)
-        sudo("source %s && export DJANGO_SETTINGS_MODULE=%s && manage.py\
+        sudo("source %s && export DJANGO_SETTINGS_MODULE=%s && django-admin.py\
                 migrate" % (activate, env.settings_module), user=env.deploy_user)
         sudo("python manage.py migrate", user=env.deploy_user)
 
