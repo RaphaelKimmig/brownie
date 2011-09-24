@@ -51,7 +51,7 @@ MEDIA_ROOT = path.realpath(path.join(MEDIA_BASE_DIR, "dynamic"))
 STATIC_URL = '/media/static/'
 STATIC_ROOT = path.realpath(path.join(MEDIA_BASE_DIR, "static"))
 
-ADMIN_MEDIA_PREFIX = STATIC_URL + '/admin/'
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'grappelli/'
 STATICFILES_DIRS = (
     path.realpath(path.join(PROJECT_ROOT, "static")),
     )

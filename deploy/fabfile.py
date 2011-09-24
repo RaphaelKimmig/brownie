@@ -21,8 +21,8 @@ env.project_base_dir = '/srv/django/'
 env.project_dir = os.path.join(env.project_base_dir, env.project_name)
 env.virtualenv_dir = os.path.join(env.project_dir, 'env')
 
-env.media_root = '/media/'
-env.static_root = '/media/static/'
+env.media_root = '/media'
+env.static_root = '/media/static'
 
 def check_dependencies(dependencies):
     missing = []
@@ -113,7 +113,7 @@ def deploy():
 
     django_command('syncdb')
     django_command('migrate')
-    django_command('collectstatic -l')
+    django_command('collectstatic')
 
 
 
