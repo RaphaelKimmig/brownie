@@ -53,12 +53,14 @@ def config_from_template(template, config, context):
 
 
 def copy_configs():
-    uwsgi_template = os.path.join(env.project_dir, 'deploy/configs/uwsgi.ini')
-    uwsgi_config = '/etc/uwsgi/apps-enabled/%s.ini' % env.project_name
+    uwsgi_template = os.path.join(env.project_dir, 'deploy/configs/uwsgi.xml')
+    uwsgi_config = '/etc/uwsgi/apps-enabled/%s.xml' % env.project_name
+    virtualen_lib = sudo("find %s -mindepth 3 -maxdepth 3 -type d -name\
+            'site-packages'" % env.virtualenv_dir, user=env.deploy_user).splitlines()[-1]
     uwsgi_context = {
         'project_name': env.project_name, 
         'project_dir': env.project_dir,
-        'env': env.virtualenv_dir,
+        'env': virtualen_lib,
         'settings_module': env.settings_module
         }
     config_from_template(uwsgi_template, uwsgi_config, uwsgi_context)
