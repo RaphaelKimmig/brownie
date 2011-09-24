@@ -55,7 +55,6 @@ def config_from_template(template, config, context):
 def copy_configs():
     uwsgi_template = os.path.join(env.project_dir, 'deploy/configs/uwsgi.ini')
     uwsgi_config = '/etc/uwsgi/apps-enabled/%s.ini' % env.project_name
-    uwsgi_config = '/tmp/a'
     uwsgi_context = {
         'project_name': env.project_name, 
         'project_dir': env.project_dir,
@@ -66,7 +65,6 @@ def copy_configs():
 
     nginx_template = os.path.join(env.project_dir, 'deploy/configs/nginx.conf')
     nginx_config = '/etc/nginx/sites-enabled/%s.conf' % env.project_name
-    nginx_config = '/tmp/b'
     nginx_context = {
         'project_dir': env.project_dir,
         'project_name': env.project_name, 
