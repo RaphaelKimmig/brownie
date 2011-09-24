@@ -97,11 +97,12 @@ def deploy():
     else:
         with cd(env.project_base_dir):
             sudo("git clone %s" % env.project_repository)
+            for dir in ('logs', 'public', 'media/static', 'media/dynamic'):
+                full_dir = os.path.join(env.project_dir, dir)
+                sudo("mkdir -p %s" % full_dir)
             sudo("chown -R %(user)s:%(user)s %(directory)s" % {'user':
                 env.deploy_user, 'directory': env.project_dir})
             sudo("chmod 750 %s" % env.project_dir)
-            for dir in ('logs', 'public', 'media/static', 'media/dynamic'):
-                sudo("mkdir -p %s" % full_dir, user=env.deploy_user)
 
     if not os.path.exists(env.virtualenv_dir):
         sudo("virtualenv --no-site-packages %s" % env.virtualenv_dir,
@@ -112,6 +113,9 @@ def deploy():
 
     django_command('syncdb')
     django_command('migrate')
+    django_command('collectstatic -l')
+
+
 
     copy_configs()
 

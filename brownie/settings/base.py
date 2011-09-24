@@ -43,7 +43,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-MEDIA_BASE_DIR = path.realpath(path.join(PROJECT_ROOT, "media"))
+MEDIA_BASE_DIR = path.realpath(path.join(PROJECT_ROOT, "../media"))
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = path.realpath(path.join(MEDIA_BASE_DIR, "dynamic"))
