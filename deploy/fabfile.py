@@ -102,7 +102,11 @@ def deploy():
         'req': os.path.join(env.project_dir, 'deploy/requirements.txt')},
         user=env.deploy_user)
     with cd(env.project_base_dir):
-        sudo("python manage.py syncdb", user=env.deploy_user)
+        activate = os.path.join(env.virtualenv_dir, 'bin/activate')
+        sudo("source %s && export DJANGO_SETTINGS_MODULE=%s && manage.py\
+                syncdb" % (activate, env.settings_module), user=env.deploy_user)
+        sudo("source %s && export DJANGO_SETTINGS_MODULE=%s && manage.py\
+                migrate" % (activate, env.settings_module), user=env.deploy_user)
         sudo("python manage.py migrate", user=env.deploy_user)
 
     copy_configs()
