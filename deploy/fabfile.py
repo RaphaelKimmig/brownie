@@ -6,6 +6,8 @@ from fabric.api import abort, cd, env, get, hide, hosts, local, prompt, \
 
 from fabric.contrib.console import confirm
 from fabric.contrib.files import upload_template 
+import StringIO
+import tempfile
 
 env.project_name = 'brownie'
 env.server_name_template = 'brownie.%(host)s'
@@ -37,29 +39,45 @@ def bootstrap_dev():
     local("virtualenv --no-site-packages ../env")
     local("pip install -E ../env -r %s" % '../requirements.txt')
 
+def config_from_template(template, config, context):
+    fd, tmp_file = tempfile.mkstemp()
+    get(template, local_path=tmp_file)
+    with open(tmp_file, 'r') as f:
+        t = f.read()
+        print t, context
+        t = t % context
+    with open(tmp_file, 'w') as f:
+        f.write(t)
+
+    put(tmp_file, config, use_sudo=True)
+
 
 def copy_configs():
     uwsgi_template = os.path.join(env.project_dir, 'deploy/configs/uwsgi.ini')
     uwsgi_config = '/etc/uwsgi/apps-enabled/%s.ini' % env.project_name
-    upload_template(uwsgi_template, uwsgi_config, {
+    uwsgi_config = '/tmp/a'
+    uwsgi_context = {
         'project_name': env.project_name, 
         'project_dir': env.project_dir,
         'env': env.virtualenv_dir,
         'settings_module': env.settings_module
-        }, use_sudo=True)
+        }
+    config_from_template(uwsgi_template, uwsgi_config, uwsgi_context)
 
     nginx_template = os.path.join(env.project_dir, 'deploy/configs/nginx.conf')
     nginx_config = '/etc/nginx/sites-enabled/%s.conf' % env.project_name
-    upload_template(nginx_template, nginx_config, {
+    nginx_config = '/tmp/b'
+    nginx_context = {
+        'project_dir': env.project_dir,
         'project_name': env.project_name, 
-        'server_name': env.server_name_template % env.host,
+        'server_name': env.server_name_template % {'host' : env.host},
         'static_root': env.static_root,
         'media_root': env.media_root,
-        }, use_sudo=True)
+        }
+    config_from_template(nginx_template, nginx_config, nginx_context)
 
 @task
 def deploy():
-    run('whoami')
     try:
         sudo("useradd %(user)s -d %(home)s -U" % {'user': env.deploy_user, 'home': env.project_dir})
     except:
