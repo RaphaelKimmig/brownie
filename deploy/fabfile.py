@@ -33,7 +33,6 @@ def check_dependencies(dependencies):
             missing.append(dependency)
     return missing
 
-
 @task
 def bootstrap_dev():
     local("virtualenv --no-site-packages ../env")
@@ -93,6 +92,7 @@ def deploy():
     if os.path.exists(env.project_dir):
         warn("Project dir %s already exists" % env.project_dir)
         with cd(env.project_dir):
+            sudo('git reset --hard', user=env.deploy_user)
             sudo('git pull', user=env.deploy_user)
     else:
         with cd(env.project_base_dir):
