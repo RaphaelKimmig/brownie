@@ -5,7 +5,7 @@ from fabric.api import abort, cd, env, get, hide, hosts, local, prompt, \
     put, require, roles, run, runs_once, settings, show, sudo, warn, task
 
 from fabric.contrib.console import confirm
-from fabric.contrib.files import upload_template 
+from fabric.contrib.files import upload_template, contains
 import StringIO
 import tempfile
 
@@ -44,7 +44,6 @@ def config_from_template(template, config, context):
     get(template, local_path=tmp_file)
     with open(tmp_file, 'r') as f:
         t = f.read()
-        print t, context
         t = t % context
     with open(tmp_file, 'w') as f:
         f.write(t)
@@ -78,10 +77,8 @@ def copy_configs():
 
 @task
 def deploy():
-    try:
+    if not contains('/etc/passwd', env.deploy_user):
         sudo("useradd %(user)s -d %(home)s -U" % {'user': env.deploy_user, 'home': env.project_dir})
-    except:
-        warn("user %s already exists" % env.deploy_user)
 
     if os.path.exists(env.project_dir):
         warn("Project dir %s already exists" % env.project_dir)
