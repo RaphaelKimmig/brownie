@@ -60,7 +60,8 @@ def copy_configs():
         'project_name': env.project_name, 
         'project_dir': env.project_dir,
         'env': virtualen_lib,
-        'settings_module': env.settings_module
+        'settings_module': env.settings_module,
+        'user': env.deploy_user,
         }
     config_from_template(uwsgi_template, uwsgi_config, uwsgi_context)
 
@@ -100,6 +101,9 @@ def deploy():
     sudo("pip install -E %(env)s -r %(req)s" % {'env': env.virtualenv_dir,
         'req': os.path.join(env.project_dir, 'deploy/requirements.txt')},
         user=env.deploy_user)
+    with cd(env.project_base_dir):
+        sudo("python manage.py syncdb", user=env.deploy_user)
+        sudo("python manage.py migrate", user=env.deploy_user)
 
     copy_configs()
     sudo('service uwsgi reload')
