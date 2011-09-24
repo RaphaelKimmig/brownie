@@ -118,8 +118,7 @@ PREREQ_APPS = (
     )
 
 PROJECT_APPS = (
-    'core',
-    'items',
+    'brownie.items',
     )
 
 INSTALLED_APPS = PREREQ_APPS + PROJECT_APPS

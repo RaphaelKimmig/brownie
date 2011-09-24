@@ -1,10 +1,11 @@
-pdm/.idea
-pdm/settings_local.py
+brownie/.idea
 *.pyc
 *.pyo
 *.swp
 *.swo
-pdm/pdm
+*.db
+brownie/settings/local.py
+brownie/media/*
 vm/*
 !vm/Vagrantfile
 !vm/manifests/*

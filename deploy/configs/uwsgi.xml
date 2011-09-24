@@ -3,7 +3,6 @@
         <master/>
 	<pythonpath>%(env)s</pythonpath>
 	<pythonpath>%(project_dir)s</pythonpath>
-        <pythonpath>%(project_dir)s/%(project_name)s</pythonpath>
 	<env>DJANGO_SETTINGS_MODULE=%(settings_module)s</env>
         <uid>%(user)s</uid>
         <gid>%(user)s</gid>
