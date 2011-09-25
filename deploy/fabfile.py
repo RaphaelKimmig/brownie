@@ -17,12 +17,51 @@ env.settings_module = '%s.settings.deploy' % env.project_name
 
 env.project_repository = 'git://github.com/RaphaelKimmig/brownie.git'
 
-env.project_base_dir = '/srv/django/'
+env.project_base_dir = '/srv/django'
 env.project_dir = os.path.join(env.project_base_dir, env.project_name)
 env.virtualenv_dir = os.path.join(env.project_dir, 'env')
 
 env.media_root = '/media'
 env.static_root = '/media/static'
+
+env.config_scheme = 'configs/default/%(config)s'
+env.per_host_config_scheme = 'configs/hosts/%(host)s/%(config)s'
+
+def get_uwsgi_data():
+    target = '/etc/uwsgi/apps-enabled/%s.xml' % env.project_name
+    virtualen_lib = sudo("find %s -mindepth 3 -maxdepth 3 -type d -name\
+            'site-packages'" % env.virtualenv_dir, user=env.deploy_user).splitlines()[-1]
+    context = {
+        'project_name': env.project_name, 
+        'project_dir': env.project_dir,
+        'env': virtualen_lib,
+        'settings_module': env.settings_module,
+        'user': env.deploy_user,
+        }
+    return {'target': target, 'context': context}
+
+def get_nginx_data():
+    target = '/etc/nginx/sites-enabled/%s.conf' % env.project_name
+    context = {
+        'project_name': env.project_name, 
+        'project_dir': env.project_dir,
+        'server_name': env.server_name_template % {'host' : env.host},
+        'static_root': env.static_root,
+        'media_root': env.media_root,
+        }
+    return {'target': target, 'context': context}
+
+def get_django_data():
+    target = os.path.join(env.project_dir, env.project_name,
+            'settings/local.py') 
+    return {'target': target, 'chown': '%s:%s' % (env.deploy_user, env.deploy_user)}
+
+env.configs = {
+        'uwsgi.xml': get_uwsgi_data,
+        'nginx.conf': get_nginx_data,
+        'django_settings.py': get_django_data 
+}
+
 
 def check_dependencies(dependencies):
     missing = []
@@ -45,44 +84,42 @@ def django_command(cmd):
                 cmd, 'activate': activate, 'settings': env.settings_module,
                 'path': env.project_dir}, user=env.deploy_user)
 
-def config_from_template(template, config, context):
-    fd, tmp_file = tempfile.mkstemp()
-    get(template, local_path=tmp_file, use_sudo=True)
-    with open(tmp_file, 'r') as f:
-        t = f.read()
-        t = t % context
-    with open(tmp_file, 'w') as f:
-        f.write(t)
-
-    put(tmp_file, config, use_sudo=True)
-
 
 def copy_configs():
-    uwsgi_template = 'configs/uwsgi.xml'
-    uwsgi_config = '/etc/uwsgi/apps-enabled/%s.xml' % env.project_name
-    virtualen_lib = sudo("find %s -mindepth 3 -maxdepth 3 -type d -name\
-            'site-packages'" % env.virtualenv_dir, user=env.deploy_user).splitlines()[-1]
-    uwsgi_context = {
-        'project_name': env.project_name, 
-        'project_dir': env.project_dir,
-        'env': virtualen_lib,
-        'settings_module': env.settings_module,
-        'user': env.deploy_user,
-        }
-    upload_template(uwsgi_template, uwsgi_config, uwsgi_context, use_sudo=True,
-            backup=False)
+    for config, data in env.configs.items():
+        per_host_file = env.per_host_config_scheme % {'host': env.host,
+                'config': config}
+        generic_file = env.config_scheme % {'host': env.host,
+                'config': config}
 
-    nginx_template = 'configs/nginx.conf'
-    nginx_config = '/etc/nginx/sites-enabled/%s.conf' % env.project_name
-    nginx_context = {
-        'project_dir': env.project_dir,
-        'project_name': env.project_name, 
-        'server_name': env.server_name_template % {'host' : env.host},
-        'static_root': env.static_root,
-        'media_root': env.media_root,
-        }
-    upload_template(nginx_template, nginx_config, nginx_context, use_sudo=True,
-            backup=False)
+        if os.path.exists(per_host_file):
+            config_file = per_host_file
+        elif os.path.exists(generic_file):
+            config_file = generic_file
+        else:
+            warn("No config file found for %s (tried %s and %s)" % (config,
+                per_host_file, generic_file))
+            continue
+        with open(config_file, 'r') as config_file:
+            if callable(data):
+                data = data()
+
+            config_content = config_file.read()
+
+            if 'context' in data:
+                config_content = config_content % data['context']
+            
+            if not 'target' in data:
+                warn("No target specified for config %s" % config)
+                continue
+
+            put(StringIO.StringIO(config_content), data['target'], use_sudo=True)
+
+            if 'chown' in data:
+                sudo('chown %s %s' % (data['chown'], data['target']))
+
+
+
 
 @task
 def deploy():
@@ -111,13 +148,11 @@ def deploy():
         'req': os.path.join(env.project_dir, 'deploy/requirements.txt')},
         user=env.deploy_user)
 
+    copy_configs()
+
     django_command('syncdb')
     django_command('migrate')
-    django_command('collectstatic')
-
-
-
-    copy_configs()
+    django_command('collectstatic --noinput')
 
     sudo('service uwsgi reload')
     sudo('service nginx reload')
