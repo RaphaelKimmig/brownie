@@ -13,7 +13,7 @@ env.project_name = 'brownie'
 env.server_name_template = 'brownie.%(host)s'
 
 env.deploy_user = 'www-data'
-env.settings_module = '%s.settings.deploy' % env.project_name
+env.settings_module = '%s.settings.local' % env.project_name
 
 env.project_repository = 'git://github.com/RaphaelKimmig/brownie.git'
 
