@@ -5,6 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
+    # we can't have a dry run because we need to create/get the campaign
+    no_dry_run = True
+    # we need this to create the related campaign
     depends_on = (
                     ("campaign", "0001_initial"),
                     )
