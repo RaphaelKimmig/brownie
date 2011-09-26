@@ -9,3 +9,4 @@ django-grappelli==2.3.3
 django-taggit==0.9.3
 -e hg+https://bitbucket.org/fabian/django-taggit-autosuggest@da9881a155a0b3c0d8f5715202a19b40f9edeffb#egg=django_taggit_autosuggest-dev
 wsgiref==0.1.2
+-e git+https://github.com/bradleyayers/django-tables2.git@7a4bd5ac9158ea5293a8780359b06db0e034faca#egg=django_tables2-dev
