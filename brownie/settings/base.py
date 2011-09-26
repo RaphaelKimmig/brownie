@@ -115,10 +115,13 @@ PREREQ_APPS = (
     'taggit',
     'taggit_autosuggest',
     'django.contrib.admin',
+    'endless_pagination',
+    'django_tables2',
     )
 
 PROJECT_APPS = (
     'brownie.items',
+    'brownie.campaign',
     )
 
 INSTALLED_APPS = PREREQ_APPS + PROJECT_APPS

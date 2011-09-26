@@ -1,0 +1,6 @@
+{% load endless %}
+{% paginate object_list %}
+{% for object in object_list %}
+    {{object}}
+{% endfor %}
+{% show_pages %}

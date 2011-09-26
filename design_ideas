@@ -1,0 +1,12 @@
+general structures and concepts:
+
+
+Compilation: gruppiert items/rassen/zauber/klassen/...: 
+
+class Item/...:
+    compilation = ForeignKey(Compilation)
+
+campaign: legt verwendete compilations fest, spaeter: private compilation pro campaign
+
+build: vorkonfiguration fuer generatoren, benoetigt bestimmte compilations, kann oeffentlich gemacht werden
+

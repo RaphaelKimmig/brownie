@@ -12,7 +12,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
                        # base test
                        url(r'^$', direct_to_template, {'template': 'base.html'}),
-                       (r'^databrowse/(.*)', databrowse.site.root),
+                       url(r'^items/', include('brownie.items.urls')),
                        # Examples:
                        # url(r'^$', 'pathfinder.views.home', name='home'),
                        # url(r'^pathfinder/', include('pathfinder.foo.urls')),
