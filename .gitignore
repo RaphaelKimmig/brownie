@@ -5,8 +5,9 @@ brownie/.idea
 *.swo
 *.db
 brownie/settings/local.py
-deploy/settings/django/hosts/*
+deploy/configs/hosts/*/*
 brownie/media/*
 vm/*
 !vm/Vagrantfile
 !vm/manifests/*
+env/*

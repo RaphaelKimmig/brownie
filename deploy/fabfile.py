@@ -5,7 +5,7 @@ from fabric.api import abort, cd, env, get, hide, hosts, local, prompt, \
     put, require, roles, run, runs_once, settings, show, sudo, warn, task
 
 from fabric.contrib.console import confirm
-from fabric.contrib.files import upload_template, contains
+from fabric.contrib.files import upload_template, contains, exists
 import StringIO
 import tempfile
 
@@ -30,7 +30,8 @@ env.per_host_config_scheme = 'configs/hosts/%(host)s/%(config)s'
 def get_uwsgi_data():
     target = '/etc/uwsgi/apps-enabled/%s.xml' % env.project_name
     virtualen_lib = sudo("find %s -mindepth 3 -maxdepth 3 -type d -name\
-            'site-packages'" % env.virtualenv_dir, user=env.deploy_user).splitlines()[-1]
+            'site-packages'" % env.virtualenv_dir, user=env.deploy_user)
+    virtualen_lib = virtualen_lib.splitlines()[-1]
     context = {
         'project_name': env.project_name, 
         'project_dir': env.project_dir,
@@ -75,7 +76,7 @@ def check_dependencies(dependencies):
 @task
 def bootstrap_dev():
     local("virtualenv --no-site-packages ../env")
-    local("pip install -E ../env -r %s" % '../requirements.txt')
+    local("pip install -E ../env -r %s" % 'requirements.txt')
 
 def django_command(cmd):
     activate = os.path.join(env.virtualenv_dir, 'bin/activate')
@@ -116,7 +117,10 @@ def copy_configs():
             put(StringIO.StringIO(config_content), data['target'], use_sudo=True)
 
             if 'chown' in data:
-                sudo('chown %s %s' % (data['chown'], data['target']))
+                chown = data['chown']
+            else:
+                chown = 'root:root'
+            sudo('chown %s %s' % (chown, data['target']))
 
 
 
@@ -126,7 +130,7 @@ def deploy():
     if not contains('/etc/passwd', env.deploy_user):
         sudo("useradd %(user)s -d %(home)s -U" % {'user': env.deploy_user, 'home': env.project_dir})
 
-    if os.path.exists(env.project_dir):
+    if exists(env.project_dir, use_sudo=True):
         warn("Project dir %s already exists" % env.project_dir)
         with cd(env.project_dir):
             sudo('git reset --hard', user=env.deploy_user)
@@ -141,7 +145,7 @@ def deploy():
                 env.deploy_user, 'directory': env.project_dir})
             sudo("chmod 750 %s" % env.project_dir)
 
-    if not os.path.exists(env.virtualenv_dir):
+    if not exists(env.virtualenv_dir, use_sudo=True):
         sudo("virtualenv --no-site-packages %s" % env.virtualenv_dir,
                 user=env.deploy_user)
     sudo("pip install -E %(env)s -r %(req)s" % {'env': env.virtualenv_dir,
